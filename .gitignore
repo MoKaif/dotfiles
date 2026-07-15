@@ -1,0 +1,19 @@
+# --- Reference rices (other people's repos, not ours) ---
+references/
+
+# --- Generated / runtime state ---
+custom/scripts/mpvpaper_thumbnails/
+scripts/wallpaper-last.txt
+*.log
+hyprland.log
+
+# --- Backups ---
+*.bak
+*.bak/
+*~
+*.orig
+
+# --- OS / editor cruft ---
+.DS_Store
+.vscode/
+.idea/

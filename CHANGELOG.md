@@ -20,6 +20,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [1.1.0] — 2026-07-16
+
+Fish now applies over SSH, which is where the machine is actually used (Claude Code and general work
+are run over SSH from Windows Terminal). v1.0.0 scoped fish to kitty, which missed that entirely.
+
+### Added
+- **fish handoff for interactive logins** in `.bash_profile`: an interactive login shell (i.e. SSH,
+  or any TTY other than tty1) `exec`s into fish. The login shell stays bash, so the boot chain is
+  untouched — no `chsh`, no password needed.
+- `.bashrc` and `.bash_profile` are now tracked in the repo and symlinked into `~`. `.bash_profile`
+  is load-bearing for both the desktop boot and the SSH shell, so it shouldn't have been unversioned.
+- README: table of every entry point (tty1 / SSH / kitty / scp / Claude Code) and which shell each
+  one lands in.
+
+### Notes — why this is safe
+Guards on the fish block, verified by test:
+- `$- == *i*` (interactive only) — `ssh host <cmd>`, scp, rsync and **Claude Code's tool shell**
+  (non-login + non-interactive, `$-` = `hmtBc`) all stay in bash.
+- The tty1 `exec start-hyprland` block sits **above** the fish block and never returns, so a desktop
+  boot cannot fall through into fish.
+- `FISH_LAUNCHED` guard prevents any re-exec loop.
+- Failure mode is safe: an interactive bash does not exit when `exec` fails, so a broken fish leaves
+  you in bash rather than locking you out of SSH.
+
 ## [1.0.0] — 2026-07-16
 
 Promoted from a hypr-only config into a real dotfiles repo, and added a full terminal stack.
@@ -87,7 +111,8 @@ Initial versioned baseline of the Hyprland config.
 - `hyprautostart.conf` — waybar, dunst, nm-applet, wallpaper cycle.
 - `hyprlock/`, `hyprpaper.conf`, `scripts/wallpaper-cycle.sh`, and supporting docs.
 
-[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/MoKaif/dotfiles/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/MoKaif/dotfiles/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/MoKaif/dotfiles/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/MoKaif/dotfiles/releases/tag/v0.1.0

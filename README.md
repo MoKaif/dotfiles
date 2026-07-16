@@ -7,6 +7,8 @@
 
 ```
 ~/dotfiles/
+├── .bashrc            → ~/.bashrc           (session env; inherited by Hyprland)
+├── .bash_profile      → ~/.bash_profile     (boot chain + fish handoff)
 ├── .config/
 │   ├── hypr/          → ~/.config/hypr      (Hyprland)
 │   ├── kitty/         → ~/.config/kitty     (terminal)
@@ -23,6 +25,8 @@ Each entry is symlinked into place, so editing `~/.config/hypr/hyprkeys.conf` ed
 
 ```sh
 git clone git@github.com:MoKaif/dotfiles.git ~/dotfiles
+ln -s ~/dotfiles/.bashrc              ~/.bashrc
+ln -s ~/dotfiles/.bash_profile        ~/.bash_profile
 ln -s ~/dotfiles/.config/hypr         ~/.config/hypr
 ln -s ~/dotfiles/.config/kitty        ~/.config/kitty
 ln -s ~/dotfiles/.config/fish         ~/.config/fish
@@ -42,12 +46,26 @@ agetty --autologin nox  →  bash (login)  →  ~/.bash_profile  →  exec start
 `start-hyprland` is Hyprland's official watchdog launcher. Fish does not read `~/.bash_profile`,
 so making fish the login shell would silently break this and leave you without a desktop on boot.
 
-**fish is the interactive shell**, launched by kitty (`shell /usr/bin/fish` in `kitty.conf`).
-That gives fish everywhere you actually type, with the boot chain untouched.
+**fish is the interactive shell**, reached two ways — never by `chsh`:
 
-Environment lives in two places by design: `~/.bashrc` (login/session env, inherited by Hyprland
-and everything it spawns) and `.config/fish/config.fish` (re-declares the same PATH/env so fish is
-correct standalone too). Keep them in sync.
+| Entry point | Shell you get | How |
+|---|---|---|
+| tty1 autologin (boot) | bash → `start-hyprland` | `.bash_profile`, execs before the fish block |
+| **SSH (interactive)** | **fish** | `.bash_profile` execs fish |
+| kitty (local) | fish | `shell /usr/bin/fish` in `kitty.conf` |
+| `ssh host <cmd>`, scp, rsync | bash | non-interactive → guard skips fish |
+| Claude Code's tool shell | bash | non-login + non-interactive → never reads `.bash_profile` |
+
+The `.bash_profile` fish block is guarded on `$- == *i*` (interactive only), so automation and
+non-interactive shells stay in bash. Ordering matters: the tty1 `exec start-hyprland` sits **above**
+the fish block and never returns, so booting the desktop can't fall through into fish.
+
+Failure is safe by design: an interactive bash does **not** exit when `exec` fails, so a broken
+fish drops you back to bash instead of locking you out of SSH.
+
+Environment lives in two places by design: `.bashrc` (session env, inherited by Hyprland and
+everything it spawns) and `.config/fish/config.fish` (re-declares the same PATH/env so fish is
+correct standalone). **Keep them in sync.**
 
 ## Terminal stack
 

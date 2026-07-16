@@ -1,15 +1,74 @@
-# Hyprland Rice Setup: Summary + Troubleshooting
+# nox's dotfiles — Hyprland / kitty / fish
 
-> **Repo:** `git@github.com:MoKaif/dotfiles.git` · tracked in-place at `~/.config/hypr`.
-> Change history lives in [CHANGELOG.md](CHANGELOG.md); current version is in [VERSION](VERSION).
+> **Repo:** `git@github.com:MoKaif/dotfiles.git` · lives at `~/dotfiles`, symlinked into `~/.config`.
+> Change history: [CHANGELOG.md](CHANGELOG.md) · current version: [VERSION](VERSION).
+
+## Layout
+
+```
+~/dotfiles/
+├── .config/
+│   ├── hypr/          → ~/.config/hypr      (Hyprland)
+│   ├── kitty/         → ~/.config/kitty     (terminal)
+│   ├── fish/          → ~/.config/fish      (interactive shell)
+│   └── starship.toml  → ~/.config/starship.toml
+├── docs/              (notes, not symlinked)
+├── CHANGELOG.md
+└── VERSION
+```
+
+Each entry is symlinked into place, so editing `~/.config/hypr/hyprkeys.conf` edits the repo directly.
+
+### Re-creating the symlinks (fresh machine)
+
+```sh
+git clone git@github.com:MoKaif/dotfiles.git ~/dotfiles
+ln -s ~/dotfiles/.config/hypr         ~/.config/hypr
+ln -s ~/dotfiles/.config/kitty        ~/.config/kitty
+ln -s ~/dotfiles/.config/fish         ~/.config/fish
+ln -s ~/dotfiles/.config/starship.toml ~/.config/starship.toml
+```
+
+## ⚠️ Shell layout — read before changing
+
+**bash is the login shell on purpose. Do not `chsh` to fish.**
+
+The desktop has **no display manager**. It boots via this chain:
+
+```
+agetty --autologin nox  →  bash (login)  →  ~/.bash_profile  →  exec start-hyprland
+```
+
+`start-hyprland` is Hyprland's official watchdog launcher. Fish does not read `~/.bash_profile`,
+so making fish the login shell would silently break this and leave you without a desktop on boot.
+
+**fish is the interactive shell**, launched by kitty (`shell /usr/bin/fish` in `kitty.conf`).
+That gives fish everywhere you actually type, with the boot chain untouched.
+
+Environment lives in two places by design: `~/.bashrc` (login/session env, inherited by Hyprland
+and everything it spawns) and `.config/fish/config.fish` (re-declares the same PATH/env so fish is
+correct standalone too). Keep them in sync.
+
+## Terminal stack
+
+| Tool | Role |
+|---|---|
+| `kitty` | terminal — rice-matched pink/dark, transparent for Hyprland blur |
+| `fish` | interactive shell — autosuggestions + syntax highlighting built in |
+| `starship` | prompt — Arch logo, dir + git left, language modules right |
+| `eza` / `bat` | `ls` / `cat` replacements (aliased) |
+| `fzf` | fuzzy find — `ctrl-r` history, `ctrl-t` files, `alt-c` cd |
+| `zoxide` | smarter `cd` — `z <partial>` |
+| `yazi` | file manager — `y`, or `yy` to cd where you quit |
+| `btop` | system monitor (aliased to `top`) |
 
 ## Maintenance workflow
 
-Every change to this config is versioned ([SemVer](https://semver.org)) and pushed. When making a change:
+Every change is versioned ([SemVer](https://semver.org)) and pushed:
 
-1. **Edit** the relevant `*.conf` / script.
-2. **Reload & verify:** `hyprctl reload` (binds/theme) or restart the affected service.
-3. **Bump [`VERSION`](VERSION)** — PATCH for tweaks/fixes, MINOR for new keybinds/modules/scripts, MAJOR for restructures.
+1. **Edit** the relevant config (via `~/.config/...` or `~/dotfiles/...` — same files).
+2. **Reload & verify:** `hyprctl reload` for Hyprland; `exec fish` or a new kitty window for shell changes.
+3. **Bump [`VERSION`](VERSION)** — PATCH for tweaks/fixes, MINOR for new keybinds/tools/modules, MAJOR for restructures.
 4. **Log it** under a new version heading in [`CHANGELOG.md`](CHANGELOG.md).
 5. **Commit, tag, push:**
    ```sh
@@ -19,10 +78,11 @@ Every change to this config is versioned ([SemVer](https://semver.org)) and push
    git push origin main --tags
    ```
 
-Future growth: other configs (nvim, kitty, zsh) can be added as sibling folders, or the repo can be
-promoted to `~/dotfiles` with symlinks (that would be a MAJOR version bump).
+---
 
-## 1) What was configured
+## Hyprland reference
+
+### 1) What was configured
 - `~/.config/hypr/hyprland.conf` now sources:
   - `/home/nox/.config/hypr/hyprtheme.conf`
   - `/home/nox/.config/hypr/hyprkeys.conf`

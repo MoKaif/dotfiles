@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this Hyprland dotfiles setup are documented here.
+All notable changes to these dotfiles (Hyprland, kitty, fish, starship) are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -19,6 +19,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 _Nothing yet._
+
+## [1.0.0] — 2026-07-16
+
+Promoted from a hypr-only config into a real dotfiles repo, and added a full terminal stack.
+
+### Changed — BREAKING
+- **Repo moved from `~/.config/hypr` to `~/dotfiles`**, with configs symlinked back into `~/.config`.
+  Configs now live under `.config/<app>/`; notes moved to `docs/`. All moves used `git mv`, so file
+  history is preserved (`git log --follow`).
+- `.gitignore` patterns un-anchored so they still match after the move.
+- `starship.toml` moved from `~/.config/starship/starship.toml` — a path starship never reads, so it
+  had been dormant and doing nothing — to `~/.config/starship.toml`, where it actually loads.
+- Starship accents retuned from blue/cyan to the rice pink palette (directory `#f2a1bd`,
+  git branch `#c99ade`, git status `#e8a5c0`, time `#958f90`).
+
+### Added
+- **kitty config** (`.config/kitty/kitty.conf`) — kitty had no config at all and ran stock defaults.
+  CaskaydiaCove Nerd Font 11, rice pink/dark palette (bg `#161013`, fg `#f8dbe4`),
+  `background_opacity 0.85` for Hyprland's blur, powerline tabs, split/tab/opacity keybinds,
+  and `shell /usr/bin/fish`.
+- **fish config** (`.config/fish/config.fish`) — rice-matched syntax colours, eza/bat/git aliases,
+  `starship`/`zoxide`/`fzf` init, rice-themed fzf using `fd` as its engine, fish-native OpenClaw
+  completions, plus `yy` (yazi cd-on-quit) and `mkcd` helpers.
+- Terminal tooling installed: `fish`, `starship`, `zoxide`, `eza`, `bat`, `fd`, `ripgrep`, `yazi`,
+  `btop`, `jq`, `chafa`, `tldr`, `neovim`, `luarocks`.
+- README: repo layout, symlink re-creation steps, terminal stack table, and a prominent warning
+  about the login-shell / boot-chain constraint.
+
+### Removed
+- Dead `exec Hyprland` block from `config.fish`. It bypassed the `start-hyprland` watchdog and was
+  inert only because fish wasn't installed — installing fish would have made it a live hazard.
+- `conf.d/fish_frozen_theme.fish` and `.bak` leftovers — fish 4.3 migration artifacts whose colours
+  are now owned by `config.fish`.
+
+### Notes
+- **bash remains the login shell, deliberately.** The desktop boots via
+  `agetty --autologin nox → bash → ~/.bash_profile → exec start-hyprland`, and fish never reads
+  `.bash_profile` — `chsh`-ing to fish would break the boot. Fish is scoped to kitty instead.
+- Dormant configs left untouched: `~/.zshrc`, `~/.oh-my-zsh`, `~/.config/zsh/` (zsh isn't the login
+  shell, so none of it loads).
+- `matugen` is referenced by `hyprlock/colors.conf` but is **not installed**; those colours are a
+  static leftover, not dynamically generated.
 
 ## [0.2.0] — 2026-07-16
 
@@ -45,6 +87,7 @@ Initial versioned baseline of the Hyprland config.
 - `hyprautostart.conf` — waybar, dunst, nm-applet, wallpaper cycle.
 - `hyprlock/`, `hyprpaper.conf`, `scripts/wallpaper-cycle.sh`, and supporting docs.
 
-[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/MoKaif/dotfiles/compare/v0.2.0...v1.0.0
 [0.2.0]: https://github.com/MoKaif/dotfiles/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/MoKaif/dotfiles/releases/tag/v0.1.0

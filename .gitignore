@@ -1,11 +1,18 @@
+# NOTE: patterns are intentionally unanchored (no leading slash) so they match
+# at any depth — configs now live under .config/<app>/.
+
 # --- Reference rices (other people's repos, not ours) ---
 references/
 
 # --- Generated / runtime state ---
-custom/scripts/mpvpaper_thumbnails/
-scripts/wallpaper-last.txt
+mpvpaper_thumbnails/
+wallpaper-last.txt
 *.log
-hyprland.log
+
+# --- fish runtime state (regenerated, not config) ---
+fish_variables
+.config/fish/completions/
+.config/fish/generated_completions/
 
 # --- Backups ---
 *.bak

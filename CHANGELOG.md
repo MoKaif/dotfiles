@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _Nothing yet._
 
+## [0.2.0] — 2026-07-16
+
+### Added
+- Autostart KDE Connect daemon (`exec-once = kdeconnectd &`) in `hyprautostart.conf`,
+  so phone integration is available on login.
+
 ## [0.1.0] — 2026-07-16
 
 Initial versioned baseline of the Hyprland config.
@@ -39,5 +45,6 @@ Initial versioned baseline of the Hyprland config.
 - `hyprautostart.conf` — waybar, dunst, nm-applet, wallpaper cycle.
 - `hyprlock/`, `hyprpaper.conf`, `scripts/wallpaper-cycle.sh`, and supporting docs.
 
-[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/MoKaif/dotfiles/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/MoKaif/dotfiles/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/MoKaif/dotfiles/releases/tag/v0.1.0
